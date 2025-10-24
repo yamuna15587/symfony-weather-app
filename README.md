@@ -19,13 +19,13 @@ bash
 `cd project-directory`
 
 # Install dependencies
-composer install
+`composer install`
 
 # Configure environment
-cp .env.example .env
+`cp .env.example .env`
 
 # Start the development server
-symfony server:start
+`symfony server:start`
 
 Usage
 API Endpoint
@@ -47,11 +47,23 @@ The application includes comprehensive PHPUnit tests:
 
 bash
 # Run all tests
-./vendor/bin/phpunit
+`php ./vendor/bin/phpunit`
 
 Configuration
 Cache Backend
 Edit config/packages/cache.yaml to use different cache adapters
+
+PHP Cs Fixer
+The application includes phpcsfixer package:
+# Command to format files according to PSR standards
+`php ./vendor/bin/php-cs-fixer fix src`
+
+Installation Through Docker
+The application includes docker compose configuration and container setup:
+`docker compose up -d --build`
+To run composer or php commands
+`docker exec -it weatherapp_php /bin/bash`
+Run all the composer/php commnads in this terminal.
 
 
 
