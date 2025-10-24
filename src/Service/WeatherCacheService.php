@@ -99,13 +99,11 @@ class WeatherCacheService
             });
 
             // Add current source information
-            $isCached = (time() - ($result['cached_at'] ?? 0)) > 0;
-            $isStale = $isCached && (time() - $result['cached_at']) > self::CACHE_TTL;
+            $isCached = 'api' === $result['source'] ? false : true;
 
             return [
                 'data' => $result['data'],
                 'source' => $isCached ? 'cache' : 'api',
-                'is_stale' => $isStale,
                 'cached_at' => $result['cached_at'] ?? null,
                 'cache_expires_in' => max(0, self::CACHE_TTL - (time() - ($result['cached_at'] ?? time()))),
                 'timestamp' => time(),
@@ -129,7 +127,10 @@ class WeatherCacheService
     private function callApi(string $url, array $options): mixed
     {
         try {
-            $response = $this->retryableClient->request('GET', $url, $options);
+            $response = $this->retryableClient->request('GET', $url, [
+                'query' => $options,
+                'timeout' => 10,
+            ]);
             $statusCode = $response->getStatusCode();
 
             if (429 === $statusCode) {
@@ -196,16 +197,13 @@ class WeatherCacheService
     private function getStaleCache(string $cacheKey): ?array
     {
         try {
-            // Try to get the cached item even if expired
-            $item = $this->cache->getItem($cacheKey);
+            // Try to fetch using cache->get with a callback that returns null
+            $staleData = $this->cache->get($cacheKey, function () {
+                return null; // avoid overwriting cache
+            });
 
-            if ($item->isHit()) {
-                $data = $item->get();
-
-                // Verify it has the expected structure
-                if (is_array($data) && isset($data['data'], $data['cached_at'])) {
-                    return $data;
-                }
+            if (is_array($staleData) && isset($staleData['data'], $staleData['cached_at'])) {
+                return $staleData;
             }
         } catch (\Exception $e) {
             $this->logger->debug('Could not retrieve stale cache', [
