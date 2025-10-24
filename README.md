@@ -42,56 +42,6 @@ curl http://localhost:8000/api/getweatherdata
 # Custom location
 curl "http://localhost:8000/api/getweatherdata?latitude=51.51&longitude=-0.13"
 
-Response Format
-
-json
-{
-  "latitude": 52.52,
-  "longitude": 13.41,
-  "generationtime_ms": 0.123,
-  "utc_offset_seconds": 0,
-  "timezone": "GMT",
-  "timezone_abbreviation": "GMT",
-  "elevation": 38.0,
-  "current_units": {
-    "time": "iso8601",
-    "interval": "seconds",
-    "temperature_2m": "°C"
-  },
-  "current": {
-    "time": "2025-10-22T10:00",
-    "interval": 900,
-    "temperature_2m": 15.2
-  },
-  "hourly_units": {
-    "time": "iso8601",
-    "temperature_2m": "°C"
-  },
-  "hourly": {
-    "time": ["2025-10-22T00:00", "2025-10-22T01:00", ...],
-    "temperature_2m": [12.1, 11.8, ...]
-  }
-}
-Error Responses
-400 Bad Request - Invalid coordinates
-
-json
-{
-  "error": "Invalid latitude. Must be between -90 and 90."
-}
-429 Too Many Requests - Rate limit still hit after retries
-
-json
-{
-  "error": "Weather service is currently rate limited. Please try again in a few minutes."
-}
-503 Service Unavailable - Network/connection error
-
-json
-{
-  "error": "Unable to connect to weather service. Please try again later."
-}
-
 Testing
 The application includes comprehensive PHPUnit tests:
 
