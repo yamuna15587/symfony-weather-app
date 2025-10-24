@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  php:
+    build:
+      context: ./docker/php
+    container_name: weatherapp_php
+    volumes:
+      - ./:/var/www/html
+    environment:
+      - SYMFONY_ENV=dev
+    depends_on:
+      - db
+
+  nginx:
+    image: nginx:latest
+    container_name: weatherapp_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./:/var/www/html
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - php
+
+  db:
+    image: mysql:8.0
+    container_name: weatherapp_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: weather_app
+      MYSQL_USER: weatherapp
+      MYSQL_PASSWORD: weatherapp
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
