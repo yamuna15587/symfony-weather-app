@@ -53,17 +53,19 @@ Configuration
 Cache Backend
 Edit config/packages/cache.yaml to use different cache adapters
 
+# Format files according to PSR standards
 PHP Cs Fixer
 The application includes phpcsfixer package:
-# Command to format files according to PSR standards
 `php ./vendor/bin/php-cs-fixer fix src`
 
-Installation Through Docker
+# Installation Through Docker
 The application includes docker compose configuration and container setup:
 `docker compose up -d --build`
 To run composer or php commands
 `docker exec -it weatherapp_php /bin/bash`
 Run all the composer/php commnads in this terminal.
 
+The application will be available at port `8080` if it use docker
+curl http://localhost:8080/api/getweatherdata
 
 
