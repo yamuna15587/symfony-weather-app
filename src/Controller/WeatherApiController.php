@@ -5,14 +5,14 @@ namespace App\Controller;
 use App\Service\WeatherCacheService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\HttpFoundation\Request;
 
 class ApiController extends AbstractController
 {
     public function __construct(
-        private WeatherCacheService $weatherCacheService
+        private WeatherCacheService $weatherCacheService,
     ) {
     }
 
@@ -25,14 +25,14 @@ class ApiController extends AbstractController
 
         if (!is_numeric($latitude) || $latitude < -90 || $latitude > 90) {
             return new JsonResponse([
-                'error' => 'Invalid latitude. Must be between -90 and 90.'
+                'error' => 'Invalid latitude. Must be between -90 and 90.',
             ], Response::HTTP_BAD_REQUEST);
         }
-        
+
         // Validate longitude range (-180 to 180)
         if (!is_numeric($longitude) || $longitude < -180 || $longitude > 180) {
             return new JsonResponse([
-                'error' => 'Invalid longitude. Must be between -180 and 180.'
+                'error' => 'Invalid longitude. Must be between -180 and 180.',
             ], Response::HTTP_BAD_REQUEST);
         }
 
@@ -43,33 +43,30 @@ class ApiController extends AbstractController
             'longitude' => $longitude,
             'hourly' => 'temperature_2m',
             'current' => 'temperature_2m',
-            'forecast_days' => 1
+            'forecast_days' => 1,
         ];
-
 
         try {
             // Now just pass the endpoint path, base URL comes from env
             $result = $this->weatherCacheService->fetchWeatherDataWithCache($options);
 
-
             return $this->json([
                 'success' => true,
                 'source' => $result['source'],
-                'cached_at' => $result['cached_at'] 
-                    ? date('Y-m-d H:i:s', $result['cached_at']) 
+                'cached_at' => $result['cached_at']
+                    ? date('Y-m-d H:i:s', $result['cached_at'])
                     : null,
                 'cache_expires_in_seconds' => $result['cache_expires_in'],
                 'timestamp' => date('Y-m-d H:i:s', $result['timestamp']),
-                'message' => $result['source'] === 'cache' 
-                    ? 'Data retrieved from cache' 
+                'message' => 'cache' === $result['source']
+                    ? 'Data retrieved from cache'
                     : 'Data retrieved from API',
-                'data' => $result['data']
+                'data' => $result['data'],
             ]);
-
         } catch (\Exception $e) {
             return $this->json([
                 'success' => false,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
