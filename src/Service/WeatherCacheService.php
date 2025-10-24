@@ -99,7 +99,7 @@ class WeatherCacheService
             });
 
             // Add current source information
-            $isCached = 'api' === $result['source'] ? false : true;
+            $isCached = (time() - ($result['cached_at'] ?? 0)) > 0;
 
             return [
                 'data' => $result['data'],
