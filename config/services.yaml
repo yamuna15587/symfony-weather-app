@@ -18,3 +18,12 @@ services:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    # configure  weather api service
+    
+    App\Service\WeatherApiService:
+        arguments:
+            $httpClient: '@http_client'              # Service reference
+            $cache: '@cache.app'                     # Service reference
+            $logger: '@logger'                       # Service reference
+            $apiBaseUrl: '%env(API_BASE_URL)%'       # Environment variable
